@@ -1,0 +1,7 @@
+data_road/
+vgg/
+gtFine_trainvaltest/
+
+vgg16.npy
+logs/*
+UNET*.h5

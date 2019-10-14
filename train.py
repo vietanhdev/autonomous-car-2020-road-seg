@@ -8,6 +8,9 @@ Lane Detection
 
 """
 
+import tensorflow as tf
+for gpu in tf.config.experimental.list_physical_devices('GPU'):
+    tf.compat.v2.config.experimental.set_memory_growth(gpu, True)
 import argparse
 import json
 

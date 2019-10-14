@@ -4,11 +4,11 @@ import os
 import re
 from glob import glob
 
-from keras.utils import Sequence
+from tensorflow.keras.utils import Sequence
 
 import numpy as np
 import scipy.misc
-from keras.preprocessing.image import load_img
+from tensorflow.keras.preprocessing.image import load_img
 from imgaug import augmenters as iaa
 
 

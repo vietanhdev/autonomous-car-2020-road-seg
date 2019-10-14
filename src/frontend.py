@@ -2,12 +2,12 @@
 
 """
 
-from keras.callbacks import TensorBoard, ModelCheckpoint, EarlyStopping
-from keras.optimizers import adam
+from tensorflow.keras.callbacks import TensorBoard, ModelCheckpoint, EarlyStopping
+from tensorflow.keras.optimizers import Adam
 
 from src.Datagen import DataSequence
 from src.backend import ENET, VGG, UNET
-from keras import callbacks
+from tensorflow.keras import callbacks
 
 
 class Segment(object):
@@ -42,7 +42,7 @@ class Segment(object):
          Train the model based on the training configurations
         :param train_configs: Configuration for the training
         """
-        optimizer = adam(train_configs["learning_rate"])
+        optimizer = Adam(train_configs["learning_rate"])
         train_times = train_configs["train_times"]
 
         # Data sequence for training
@@ -57,10 +57,10 @@ class Segment(object):
 
         # define the callbacks for training
         tb = TensorBoard(log_dir=train_configs["logs_dir"], write_graph=True)
-        mc = ModelCheckpoint(mode='max', filepath=train_configs["save_model_name"], monitor='acc',
+        mc = ModelCheckpoint(mode='max', filepath=train_configs["save_model_name"], monitor='accuracy',
                              save_best_only='True',
                              save_weights_only='True', verbose=2)
-        es = EarlyStopping(mode='max', monitor='acc', patience=6, verbose=1)
+        es = EarlyStopping(mode='max', monitor='accuracy', patience=6, verbose=1)
         model_reducelr = callbacks.ReduceLROnPlateau(
             monitor='loss',
             factor=0.2,

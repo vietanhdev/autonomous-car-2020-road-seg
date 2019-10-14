@@ -1,7 +1,6 @@
-from keras import Input, Model
-from keras.layers import Conv2D, MaxPooling2D, concatenate, BatchNormalization, PReLU, SpatialDropout2D, Add, \
-    Conv2DTranspose, ReLU, Activation, Permute, ZeroPadding2D, UpSampling2D, K, Dense, Reshape, Concatenate
-
+from tensorflow.keras import Input, Model
+from tensorflow.keras.layers import Conv2D, MaxPooling2D, concatenate, BatchNormalization, PReLU, SpatialDropout2D, Add, \
+    Conv2DTranspose, ReLU, Activation, Permute, ZeroPadding2D, UpSampling2D, Dense, Reshape, Concatenate
 
 class ENET():
 
@@ -56,7 +55,7 @@ class ENET():
             ksize = 2
             skip = MaxPooling2D(pool_size=(2, 2), name=f'max_pool_{name}')(skip)
             skip = Permute((1, 3, 2), name=f'permute_1_{name}')(skip)  # (B, H, W, C) -> (B, H, C, W)
-            ch_pad = nfilters - K.int_shape(tensor)[-1]
+            ch_pad = nfilters - tf.compat.v2.keras.backend.int_shape(tensor)[-1]
             skip = ZeroPadding2D(padding=((0, 0), (0, ch_pad)), name=f'zeropadding_{name}')(skip)
             skip = Permute((1, 3, 2), name=f'permute_2_{name}')(skip)  # (B, H, C, W) -> (B, H, W, C)
 
