@@ -24,10 +24,11 @@ class DataSequence(Sequence):
 
         self.batch_size = batch_size
         self.image_shape = image_shape
-        self.image_paths = glob(os.path.join(data_dir, 'image_2', '*.png'))
+        self.image_paths = glob(os.path.join(data_dir, 'image_2', '*.png')) + glob(os.path.join(data_dir, 'image', '*.png'))
         self.label_paths = {
             re.sub(r'_(lane|road)_', '_', os.path.basename(path)): path
-            for path in glob(os.path.join(data_dir, 'gt_image_2', '*_road_*.png'))}
+            for path in glob(os.path.join(data_dir, 'gt_image_2', '*_road_*.png')) + glob(os.path.join(data_dir, 'image_gt', '*.png'))
+            }
         self.sometimes = lambda aug: iaa.Sometimes(0.5, aug)
 
         self.aug_pipe = iaa.Sequential(
