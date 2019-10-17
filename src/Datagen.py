@@ -27,10 +27,10 @@ class DataSequence(Sequence):
         self.batch_size = batch_size
         self.image_shape = image_shape
 
-        image_set1 = glob(os.path.join(data_dir, 'image_2', '*.png'))
+        image_set1 = glob(os.path.join(data_dir, 'kitti', '*.png'))
         image_set2 = glob(os.path.join(data_dir, 'carla_static', '*.png'))
         image_set3 = glob(os.path.join(data_dir, 'carla_dynamic', '*.png'))
-        image_set4 = glob(os.path.join(data_dir, 'image', '*.png'))
+        image_set4 = glob(os.path.join(data_dir, 'cds', '*.png'))
 
         shuffle(image_set1)
         shuffle(image_set2)
@@ -41,10 +41,10 @@ class DataSequence(Sequence):
 
         self.label_paths = {
             re.sub(r'_(lane|road)_', '_', os.path.basename(path)): path
-            for path in glob(os.path.join(data_dir, 'gt_image_2', '*_road_*.png')) \
-                + glob(os.path.join(data_dir, 'seg_carla_static', '*.png')) \
-                + glob(os.path.join(data_dir, 'seg_carla_dynamic', '*.png')) \
-                + glob(os.path.join(data_dir, 'image_gt', '*.png'))
+            for path in glob(os.path.join(data_dir, 'kitti_seg', '*_road_*.png')) \
+                + glob(os.path.join(data_dir, 'carla_static_seg', '*.png')) \
+                + glob(os.path.join(data_dir, 'carla_dynamic_seg', '*.png')) \
+                + glob(os.path.join(data_dir, 'cds_seg', '*.png'))
             }
         self.sometimes = lambda aug: iaa.Sometimes(0.5, aug)
 
