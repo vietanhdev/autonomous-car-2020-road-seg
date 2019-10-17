@@ -1,3 +1,4 @@
+import tensorflow as tf
 from tensorflow.keras import Input, Model
 from tensorflow.keras.layers import Conv2D, MaxPooling2D, concatenate, BatchNormalization, PReLU, SpatialDropout2D, Add, \
     Conv2DTranspose, ReLU, Activation, Permute, ZeroPadding2D, UpSampling2D, Dense, Reshape, Concatenate
@@ -177,7 +178,7 @@ class ENET():
 
         img_output = Conv2DTranspose(self.nclasses, kernel_size=(2, 2), strides=(2, 2), kernel_initializer='he_normal',
                                      padding='same', name='image_output')(x)
-        img_output = Activation('softmax')(img_output)
+        img_output = Activation('sigmoid')(img_output)
 
         model = Model(inputs=img_input, outputs=img_output, name='ENET')
         print('. . . . .Build Compeleted. . . . .')
