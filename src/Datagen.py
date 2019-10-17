@@ -79,6 +79,7 @@ class DataSequence(Sequence):
         :param path_list: list that consists of all the image paths
         :return: Retrieve the images in batches
         """
+        images = []
         # Fetch a batch of images from a list of paths
         for im in path_list[idx * self.batch_size: (1 + idx) * self.batch_size]:
             # load the image and resize
@@ -86,7 +87,8 @@ class DataSequence(Sequence):
             image = scipy.misc.imresize(image, (self.image_shape[1], self.image_shape[0]))
             # augment the image
             image = self.aug_pipe.augment_image(image)
-            return np.array([image])
+            images.append(image)
+        return np.array(images)
 
 
     def get_batch_labels(self, idx, path_list):
@@ -97,6 +99,7 @@ class DataSequence(Sequence):
         :param path_list: list that consists of all the mask paths
         :return: mask labels
         """
+        gt_images = []
         # iterate and map the mask labels for the respective images
         for im in path_list[idx * self.batch_size: (1 + idx) * self.batch_size]:
             gt_image_file = self.label_paths[os.path.basename(im)]
@@ -106,7 +109,8 @@ class DataSequence(Sequence):
             gt_bg = np.all(gt_image == background_color, axis=2)
             gt_bg = gt_bg.reshape(*gt_bg.shape, 1)
             gt_image = np.concatenate((gt_bg, np.invert(gt_bg)), axis=2)
-            return np.array([gt_image])
+            gt_images.append(gt_image)
+        return np.array(gt_images)
 
     def __getitem__(self, idx):
         """
