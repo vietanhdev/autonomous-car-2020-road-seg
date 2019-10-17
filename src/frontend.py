@@ -50,8 +50,8 @@ class Segment(object):
         steps_per_epoch = len(sequence)
 
         # configure the model for training
-
-        self.feature_extractor.compile(optimizer=optimizer, loss='categorical_crossentropy',
+        # https://www.depends-on-the-definition.com/unet-keras-segmenting-images/
+        self.feature_extractor.compile(optimizer=optimizer, loss='binary_crossentropy',
                                        metrics=['accuracy'])
 
         # define the callbacks for training

@@ -338,7 +338,7 @@ class UNET():
         conv10 = Conv2D(self.nclasses, (1, 1), name='conv_10_1')(conv9)
 
         x = Reshape((self.im_width * self.im_height, self.nclasses))(conv10)
-        x = Activation('softmax')(x)
+        x = Activation('sigmoid')(x)
         outputs = Reshape((self.im_height, self.im_width, self.nclasses))(x)
 
         model = Model(inputs=inputs, outputs=outputs)

@@ -118,9 +118,10 @@ class DataSequence(Sequence):
             gt_image = scipy.misc.imresize(gt_image, (self.image_shape[1], self.image_shape[0]))
             background_color = np.array([255, 0, 0])
             gt_bg = np.all(gt_image == background_color, axis=2)
-            gt_bg = gt_bg.reshape(*gt_bg.shape, 1)
-            gt_image = np.concatenate((gt_bg, np.invert(gt_bg)), axis=2)
-            gt_images.append(gt_image)
+            # gt_bg = gt_bg.reshape(*gt_bg.shape, 1)
+            # gt_image = np.concatenate((gt_bg, np.invert(gt_bg)), axis=2)
+            # gt_images.append(gt_image)
+            gt_images.append(np.invert(gt_bg))
         return np.array(gt_images)
 
     def __getitem__(self, idx):
