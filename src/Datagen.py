@@ -11,6 +11,8 @@ import scipy.misc
 from tensorflow.keras.preprocessing.image import load_img
 from imgaug import augmenters as iaa
 
+from random import shuffle
+
 
 class DataSequence(Sequence):
 
@@ -24,10 +26,19 @@ class DataSequence(Sequence):
 
         self.batch_size = batch_size
         self.image_shape = image_shape
-        self.image_paths = sorted(glob(os.path.join(data_dir, 'image_2', '*.png'))) \
-                        + sorted(glob(os.path.join(data_dir, 'carla_static', '*.png'))) \
-                        + sorted(glob(os.path.join(data_dir, 'carla_dynamic', '*.png'))) \
-                        + sorted(glob(os.path.join(data_dir, 'image', '*.png')))
+
+        image_set1 = glob(os.path.join(data_dir, 'image_2', '*.png'))
+        image_set2 = glob(os.path.join(data_dir, 'carla_static', '*.png'))
+        image_set3 = glob(os.path.join(data_dir, 'carla_dynamic', '*.png'))
+        image_set4 = glob(os.path.join(data_dir, 'image', '*.png'))
+
+        shuffle(image_set1)
+        shuffle(image_set2)
+        shuffle(image_set3)
+        shuffle(image_set4)
+
+        self.image_paths = image_set1 + image_set2 + image_set3 + image_set4
+
         self.label_paths = {
             re.sub(r'_(lane|road)_', '_', os.path.basename(path)): path
             for path in glob(os.path.join(data_dir, 'gt_image_2', '*_road_*.png')) \
