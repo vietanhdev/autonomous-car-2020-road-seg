@@ -43,12 +43,11 @@ class Segment(object):
         :param train_configs: Configuration for the training
         """
         optimizer = Adam(train_configs["learning_rate"])
-        train_times = train_configs["train_times"]
 
         # Data sequence for training
         sequence = DataSequence(train_configs["data_directory"] + "data_road/training", train_configs["batch_size"],
                                 self.input_size)
-        steps_per_epoch = len(sequence) * train_times
+        steps_per_epoch = len(sequence)
 
         # configure the model for training
 
