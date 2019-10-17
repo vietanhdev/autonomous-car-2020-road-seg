@@ -40,27 +40,27 @@ class DataSequence(Sequence):
         self.aug_pipe = iaa.Sequential(
             [
                 iaa.SomeOf((0, 5),
-                           [
-                               iaa.OneOf([
-                                   iaa.GaussianBlur((0, 3.0)),  # blur images with a sigma between 0 and 3.0
-                                   iaa.AverageBlur(k=(2, 7)),
-                                   # blur image using local means with kernel sizes between 2 and 7
-                                   iaa.MedianBlur(k=(3, 11)),
-                                   # blur image using local medians with kernel sizes between 2 and 7
-                               ]),
-                               iaa.Sharpen(alpha=(0, 1.0), lightness=(0.75, 1.5)),  # sharpen images
+                [
+                    iaa.OneOf([
+                        iaa.GaussianBlur((0, 3.0)),  # blur images with a sigma between 0 and 3.0
+                        iaa.AverageBlur(k=(2, 7)),
+                        # blur image using local means with kernel sizes between 2 and 7
+                        iaa.MedianBlur(k=(3, 11)),
+                        # blur image using local medians with kernel sizes between 2 and 7
+                    ]),
+                    iaa.Sharpen(alpha=(0, 1.0), lightness=(0.75, 1.5)),  # sharpen images
 
-                               iaa.AdditiveGaussianNoise(loc=0, scale=(0.0, 0.05 * 255), per_channel=0.5),
-                               iaa.OneOf([
-                                   iaa.Dropout((0.01, 0.1), per_channel=0.5),  # randomly remove up to 10% of the pixels
-                               ]),
-                               iaa.Add((-10, 10), per_channel=0.5),
-                               # change brightness of images (by -10 to 10 of original value)
-                               iaa.Multiply((0.5, 1.5), per_channel=0.5),
-                               iaa.ContrastNormalization((0.5, 2.0), per_channel=0.5),  # improve or worsen the contrast
-                           ],
-                           random_order=True
-                           )
+                    iaa.AdditiveGaussianNoise(loc=0, scale=(0.0, 0.05 * 255), per_channel=0.5),
+                    iaa.OneOf([
+                        iaa.Dropout((0.01, 0.1), per_channel=0.5),  # randomly remove up to 10% of the pixels
+                    ]),
+                    iaa.Add((-10, 10), per_channel=0.5),
+                    # change brightness of images (by -10 to 10 of original value)
+                    iaa.Multiply((0.5, 1.5), per_channel=0.5),
+                    iaa.ContrastNormalization((0.5, 2.0), per_channel=0.5),  # improve or worsen the contrast
+                ],
+                random_order=True
+                )
             ],
             random_order=True
         )
