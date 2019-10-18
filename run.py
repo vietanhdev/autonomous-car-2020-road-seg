@@ -19,7 +19,7 @@ from src.frontend import Segment
 
 # define command line arguments
 argparser = argparse.ArgumentParser(
-    description='Train and validate Kitti Road Segmentation Model')
+    description='Run Road Segmentation Model on a video')
 
 argparser.add_argument(
     '-c',
