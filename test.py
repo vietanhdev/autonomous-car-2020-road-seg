@@ -20,6 +20,7 @@ import os
 from src.data_utils.data_loader import get_pairs_from_paths, get_segmentation_arr, get_image_arr
 from src.frontend import Segment
 from src.metrics import get_iou
+import time
 
 # define command line arguments
 argparser = argparse.ArgumentParser(
@@ -57,18 +58,27 @@ def _main_(args):
     model.load_weights(config['test']['model_file'])
 
     ious = []
+    fps_history = []
     for inp, ann  in tqdm( get_pairs_from_paths(config['test']['test_images'], config['test']['test_annotations']) ):
         net_input = np.expand_dims(get_image_arr(inp, input_size[0], input_size[1]), axis=0)
+
+        start_time = time.time()
         pred_raw = model.predict(net_input)
+        pred_time = time.time() - start_time
+        fps_history.append(1.0 / pred_time)
+
         ground_truth = get_segmentation_arr( ann , config['model']['classes'],  config['model']['out_width'], config['model']['out_height']  )
         pred = pred_raw[:,:,:,:].reshape((pred_raw.shape[1], pred_raw.shape[2], config['model']['classes']))
         pred[pred>0.5] = 1
         iou = get_iou( ground_truth, pred, config['model']['classes'] )
-        print("IoU of class 1 (road) in current image: ", iou[1])
         ious.append( iou[1] )
-    
+
+        print("IoU of class 1 (road) in current image: ", iou[1])
+        print("Avg. prediction FPS: ", np.mean(fps_history))
+
     ious = np.array( ious )
     print("Mean IoU of class 1 (road): "  ,  np.mean(ious ))
+    print("Avg. prediction FPS: ", np.mean(fps_history))
 
 
 if __name__ == '__main__':
