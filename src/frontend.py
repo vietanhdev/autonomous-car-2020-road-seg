@@ -55,6 +55,11 @@ class Segment(object):
         self.feature_extractor.compile(optimizer=optimizer, loss='categorical_crossentropy',
                                        metrics=['accuracy'])
 
+        # Load pretrained model
+        if train_configs["load_pretrained_weights"]:
+            print("Loading pretrained weights: " + train_configs["pretrained_weights_path"])
+            self.feature_extractor.load_weights(train_configs["pretrained_weights_path"])
+
         # define the callbacks for training
         tb = TensorBoard(log_dir=train_configs["logs_dir"], write_graph=True)
         mc = ModelCheckpoint(mode='max', filepath=train_configs["save_model_name"], monitor='accuracy',
