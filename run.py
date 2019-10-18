@@ -82,13 +82,13 @@ def _main_(args):
             # Sub mean
             # Because we use it with the training samples, I put it here
             # See in ./src/data/data_utils/data_loader
-            raw = raw.astype(np.float32)
-            raw[:,:,0] -= 103.939
-            raw[:,:,1] -= 116.779
-            raw[:,:,2] -= 123.68
-            raw = raw[ : , : , ::-1 ]
+            img = raw.astype(np.float32)
+            img[:,:,0] -= 103.939
+            img[:,:,1] -= 116.779
+            img[:,:,2] -= 123.68
+            img = img[ : , : , ::-1 ]
 
-            net_input = np.expand_dims(raw, axis=0)
+            net_input = np.expand_dims(img, axis=0)
             preds = model.predict(net_input, verbose=1)
             pred_1 = preds[:,:,:,1].reshape((input_size[1], input_size[0]))
             pred_1[pred_1 < 0.2] = 0
