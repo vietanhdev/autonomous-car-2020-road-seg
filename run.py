@@ -3,8 +3,7 @@
 """
 Lane Detection
 
-    # Test a new model using kitti
-    Usage: python3 test.py  --conf=./config.json
+    Usage: python3 run.py  --conf=./config.json
 
 """
 

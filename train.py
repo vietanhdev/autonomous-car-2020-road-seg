@@ -3,7 +3,7 @@
 """
 Lane Detection
 
-    # Train a new model using kitti
+    # Train a new model
     Usage: python3 train.py  --conf=./config.json
 
 """
