@@ -9,8 +9,16 @@
 
 ## II. Training:
 
+- Train the first time with general dataset
+
 ```
-python3 train.py  --conf=./config.json
+python3 train.py  --conf=./config_UNet.json
+```
+
+- Train again with dataset from Cuoc Dua So
+
+```
+python3 train.py  --conf=./config_UNet_final.json
 ```
 
 ## III. Run:
