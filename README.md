@@ -16,3 +16,10 @@ python3 train.py  --conf=./config.json
 ## III. Run:
 
 - Use `run.py`.
+
+
+## NOTE: Run without GPU:
+
+```
+CUDA_VISIBLE_DEVICES="" <command>
+```
