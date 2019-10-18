@@ -29,7 +29,7 @@ def get_pairs_from_paths( images_path , segs_path ):
 		return ret
 
 
-def get_image_arr( path , width , height , imgNorm="sub_mean" , ordering='channels_first' ):
+def get_image_arr( path , width , height , imgNorm="sub_mean" , ordering='channels_last' ):
 
 	if type( path ) is np.ndarray:
 		img = path
