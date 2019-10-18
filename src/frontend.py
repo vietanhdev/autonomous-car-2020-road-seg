@@ -5,7 +5,7 @@
 from tensorflow.keras.callbacks import TensorBoard, ModelCheckpoint, EarlyStopping
 from tensorflow.keras.optimizers import Adam
 
-from src.Datagen import DataSequence
+from src.data_utils.DataSequence import DataSequence
 from src.backend import ENET, VGG, UNET
 from tensorflow.keras import callbacks
 
@@ -36,7 +36,7 @@ class Segment(object):
         else:
             raise ValueError('No such arch!... Please check the backend in config file')
 
-    def train(self, train_configs):
+    def train(self, train_configs, model_configs):
 
         """
          Train the model based on the training configurations
@@ -45,20 +45,21 @@ class Segment(object):
         optimizer = Adam(train_configs["learning_rate"])
 
         # Data sequence for training
-        sequence = DataSequence(train_configs["data_directory"] + "data_road/training", train_configs["batch_size"],
-                                self.input_size)
-        steps_per_epoch = len(sequence)
+        train_gen = DataSequence( train_configs["train_images"] , train_configs["train_annotations"],  train_configs["train_batch_size"],  model_configs['classes'] , model_configs['im_height'] , model_configs['im_width'] , model_configs['out_height'] , model_configs['out_width'], do_augment=True)
+
+        # Data sequence for validation
+        val_gen = DataSequence( train_configs["val_images"] , train_configs["val_annotations"],  train_configs["val_batch_size"],  model_configs['classes'] , model_configs['im_height'] , model_configs['im_width'] , model_configs['out_height'] , model_configs['out_width'], do_augment=True)
 
         # configure the model for training
         # https://www.depends-on-the-definition.com/unet-keras-segmenting-images/
-        self.feature_extractor.compile(optimizer=optimizer, loss='binary_crossentropy',
+        self.feature_extractor.compile(optimizer=optimizer, loss='categorical_crossentropy',
                                        metrics=['accuracy'])
 
         # define the callbacks for training
         tb = TensorBoard(log_dir=train_configs["logs_dir"], write_graph=True)
         mc = ModelCheckpoint(mode='max', filepath=train_configs["save_model_name"], monitor='accuracy',
-                             save_best_only='True',
-                             save_weights_only='True', verbose=2)
+                             save_best_only=True,
+                             save_weights_only=False, verbose=2)
         es = EarlyStopping(mode='max', monitor='accuracy', patience=6, verbose=1)
         model_reducelr = callbacks.ReduceLROnPlateau(
             monitor='loss',
@@ -70,8 +71,10 @@ class Segment(object):
         callback = [tb, mc, es, model_reducelr]
 
         # Train the model on data generated batch-by-batch by the DataSequence generator
-        self.feature_extractor.fit_generator(sequence,
-                                             steps_per_epoch=steps_per_epoch,
+        self.feature_extractor.fit_generator(train_gen,
+                                             steps_per_epoch=len(train_gen),
+                                             validation_data=val_gen, 
+                                             validation_steps=len(val_gen),
                                              epochs=train_configs["nb_epochs"],
                                              verbose=1,
                                              shuffle=True, callbacks=callback,

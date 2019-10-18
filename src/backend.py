@@ -178,7 +178,7 @@ class ENET():
 
         img_output = Conv2DTranspose(self.nclasses, kernel_size=(2, 2), strides=(2, 2), kernel_initializer='he_normal',
                                      padding='same', name='image_output')(x)
-        img_output = Activation('sigmoid')(img_output)
+        img_output = Activation('softmax')(img_output)
 
         model = Model(inputs=img_input, outputs=img_output, name='ENET')
         print('. . . . .Build Compeleted. . . . .')
@@ -339,7 +339,7 @@ class UNET():
         conv10 = Conv2D(self.nclasses, (1, 1), name='conv_10_1')(conv9)
 
         x = Reshape((self.im_width * self.im_height, self.nclasses))(conv10)
-        x = Activation('sigmoid')(x)
+        x = Activation('softmax')(x)
         outputs = Reshape((self.im_height, self.im_width, self.nclasses))(x)
 
         model = Model(inputs=inputs, outputs=outputs)

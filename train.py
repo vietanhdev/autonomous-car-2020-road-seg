@@ -14,7 +14,6 @@ for gpu in tf.config.experimental.list_physical_devices('GPU'):
 import argparse
 import json
 
-from src.DataHandler import DataSanity
 from src.frontend import Segment
 
 # define command line arguments
@@ -43,14 +42,10 @@ def _main_(args):
     backend = config["model"]["backend"]
     input_size = (config["model"]["im_width"], config["model"]["im_height"])
     classes = config["model"]["classes"]
-    data_dir = config["train"]["data_directory"]
-
-    # Trigger the the dataset downloader if the dataset is not present
-    DataSanity(data_dir).dispatch()
 
     # define the model and train
     segment = Segment(backend, input_size, classes)
-    segment.train(config["train"])
+    segment.train(config["train"], config["model"])
 
 
 if __name__ == '__main__':

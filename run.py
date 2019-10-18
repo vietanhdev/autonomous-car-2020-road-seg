@@ -78,9 +78,19 @@ def _main_(args):
         ret, frame = cap.read()
         if ret == True:
             raw = cv2.resize(frame, (input_size[0], input_size[1]))
+
+            # Sub mean
+            # Because we use it with the training samples, I put it here
+            # See in ./src/data/data_utils/data_loader
+            raw = raw.astype(np.float32)
+            raw[:,:,0] -= 103.939
+            raw[:,:,1] -= 116.779
+            raw[:,:,2] -= 123.68
+            raw = raw[ : , : , ::-1 ]
+
             net_input = np.expand_dims(raw, axis=0)
             preds = model.predict(net_input, verbose=1)
-            pred_1 = preds[:,:,:,0].reshape((input_size[1], input_size[0]))
+            pred_1 = preds[:,:,:,1].reshape((input_size[1], input_size[0]))
             pred_1[pred_1 < 0.2] = 0
             # print(pred_1)
             cv2.imshow("Raw", raw)

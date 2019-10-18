@@ -2,3 +2,4 @@ logs/*
 *.pyc
 UNET*.h5
 .vscode
+data/*

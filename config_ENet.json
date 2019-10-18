@@ -1,18 +1,24 @@
 {
     "model" : {
-        "backend":              "ENET",
-        "im_width":             320,
-        "im_height":            240,
-        "classes":              1
+        "backend":                      "ENET",
+        "im_width":                     320,
+        "im_height":                    240,
+        "out_width":                    320,
+        "out_height":                   240,
+        "classes":                      2
     },
 
     "train": {
-        "data_directory":       "./data/",
-        "batch_size":           12,
-        "learning_rate":        1e-4,
-        "nb_epochs":            40,
-        "debug":                true,
-        "save_model_name" :     "UNET.h5",
-        "logs_dir" :            "logs"
+        "train_images":                 "./data/train/rgb",
+        "train_annotations":            "./data/train/seg",
+        "val_images":                   "./data/val/rgb",
+        "val_annotations":              "./data/val/seg",
+        "train_batch_size":             12,
+        "val_batch_size":               12,
+        "learning_rate":                1e-4,
+        "nb_epochs":                    40,
+        "debug":                        true,
+        "save_model_name" :             "ENET.h5",
+        "logs_dir" :                    "logs"
     }
 }
