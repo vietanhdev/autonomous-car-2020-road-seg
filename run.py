@@ -41,6 +41,8 @@ argparser.add_argument(
     help='path to output video file')
 
 
+count = 0
+
 def _main_(args):
     """
     :param args: command line argument
@@ -75,38 +77,41 @@ def _main_(args):
     while(cap.isOpened()):
         # Capture frame-by-frame
         ret, frame = cap.read()
-        if ret == True:
-            raw = cv2.resize(frame, (input_size[0], input_size[1]))
+        if not ret:
+            break
 
-            # Sub mean
-            # Because we use it with the training samples, I put it here
-            # See in ./src/data/data_utils/data_loader
-            img = raw.astype(np.float32)
-            img[:,:,0] -= 103.939
-            img[:,:,1] -= 116.779
-            img[:,:,2] -= 123.68
-            img = img[ : , : , ::-1 ]
+        raw = cv2.resize(frame, (input_size[0], input_size[1]))
 
-            net_input = np.expand_dims(img, axis=0)
-            preds = model.predict(net_input, verbose=1)
-            pred_1 = preds[:,:,:,1].reshape((input_size[1], input_size[0]))
-            # pred_1[pred_1 < 0.2] = 0
-            # print(pred_1)
+        # Sub mean
+        # Because we use it with the training samples, I put it here
+        # See in ./src/data/data_utils/data_loader
+        img = raw.astype(np.float32)
+        img[:,:,0] -= 103.939
+        img[:,:,1] -= 116.779
+        img[:,:,2] -= 123.68
+        img = img[ : , : , ::-1 ]
 
-            # Write output
-            if args.out_video is not None:
-                pred_out = 255 * pred_1 # Now scale by 255
-                out_img = pred_out.astype(np.uint8)
-                # Write the frame into the output
-                out_vid.write(out_img)
+        net_input = np.expand_dims(img, axis=0)
+        preds = model.predict(net_input, verbose=1)
+        pred_1 = preds[:,:,:,1].reshape((input_size[1], input_size[0]))
+        # pred_1[pred_1 < 0.2] = 0
+        # print(pred_1)
 
-            cv2.imshow("Raw", raw)
-            cv2.waitKey(1)
-            cv2.imshow("pred_1", pred_1)
-            cv2.waitKey(1)
+        # Write output
+        if args.out_video is not None:
+            pred_out = 255 * pred_1 # Now scale by 255
+            out_img = pred_out.astype(np.uint8)
+            # Write the frame into the output
+            out_vid.write(out_img)
+
+        cv2.imshow("Raw", raw)
+        cv2.waitKey(1)
+        cv2.imshow("pred_1", pred_1)
+        cv2.waitKey(1)
             
-            cap.release()
-            out_vid.release()
+    cap.release()
+    if args.out_video is not None:
+        out_vid.release()
 
 
 if __name__ == '__main__':
