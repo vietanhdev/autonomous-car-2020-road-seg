@@ -15,7 +15,6 @@ import numpy as np
 import argparse
 import json
 
-from src.frontend import Segment
 
 # define command line arguments
 argparser = argparse.ArgumentParser(
@@ -49,18 +48,10 @@ def _main_(args):
     with open(config_path) as config_buffer:
         config = json.loads(config_buffer.read())
 
-    # parse the json to retrieve the training configuration
-    backend = config["model"]["backend"]
-    input_size = (config["model"]["im_width"], config["model"]["im_height"])
-    classes = config["model"]["classes"]
-
-    # define the model and train
-    segment = Segment(backend, input_size, classes)
-   
-    model = segment.feature_extractor
-
     # Load best model
-    model.load_weights(args.model)
+    model = tf.keras.models.load_model(args.model)
+
+    input_size = (config["model"]["im_width"], config["model"]["im_height"])
 
     # Create a VideoCapture object and read from input file
     # If the input is the camera, pass 0 instead of the video file name
