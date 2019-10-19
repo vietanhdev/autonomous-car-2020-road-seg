@@ -41,7 +41,6 @@ argparser.add_argument(
     help='path to output video file')
 
 
-count = 0
 
 def _main_(args):
     """
