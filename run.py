@@ -35,6 +35,11 @@ argparser.add_argument(
     '--video', default="video.mp4",
     help='path to video file')
 
+argparser.add_argument(
+    '-o',
+    '--out_video',
+    help='path to output video file')
+
 
 def _main_(args):
     """
@@ -56,6 +61,10 @@ def _main_(args):
     # Create a VideoCapture object and read from input file
     # If the input is the camera, pass 0 instead of the video file name
     cap = cv2.VideoCapture(args.video)
+
+    # Init out video writer
+    if args.out_video is not None:
+        out_vid = out = cv2.VideoWriter(args.out_video,cv2.VideoWriter_fourcc('M','J','P','G'), cap.get(cv2.CAP_PROP_FPS), (config["model"]["out_width"], config["model"]["out_height"]))
     
     # Check if camera opened successfully
     if (cap.isOpened()== False): 
@@ -81,13 +90,23 @@ def _main_(args):
             net_input = np.expand_dims(img, axis=0)
             preds = model.predict(net_input, verbose=1)
             pred_1 = preds[:,:,:,1].reshape((input_size[1], input_size[0]))
-            pred_1[pred_1 < 0.2] = 0
+            # pred_1[pred_1 < 0.2] = 0
             # print(pred_1)
+
+            # Write output
+            if args.out_video is not None:
+                pred_out = 255 * pred_1 # Now scale by 255
+                out_img = pred_out.astype(np.uint8)
+                # Write the frame into the output
+                out_vid.write(out_img)
+
             cv2.imshow("Raw", raw)
             cv2.waitKey(1)
             cv2.imshow("pred_1", pred_1)
             cv2.waitKey(1)
-            print(preds.shape)
+            
+            cap.release()
+            out_vid.release()
 
 
 if __name__ == '__main__':
