@@ -14,6 +14,7 @@ for gpu in tf.config.experimental.list_physical_devices('GPU'):
 import numpy as np
 import argparse
 import json
+import os
 
 
 # define command line arguments
@@ -40,7 +41,10 @@ argparser.add_argument(
     '--out_video',
     help='path to output video file')
 
-
+argparser.add_argument(
+    '-oi',
+    '--out_images',
+    help='path to output image folder'')
 
 def _main_(args):
     """
@@ -71,7 +75,8 @@ def _main_(args):
     if (cap.isOpened()== False): 
         print("Error opening video stream or file")
         return
-
+        
+    count = 0
     # Read until video is completed
     while(cap.isOpened()):
         # Capture frame-by-frame
@@ -96,16 +101,21 @@ def _main_(args):
         # pred_1[pred_1 < 0.2] = 0
         # print(pred_1)
 
+        pred_out = 255 * pred_1 # Now scale by 255
+        out_img = pred_out.astype(np.uint8)
+
         # Write output
         if args.out_video is not None:
-            pred_out = 255 * pred_1 # Now scale by 255
-            out_img = pred_out.astype(np.uint8)
             # Write the frame into the output
             out_vid.write(out_img)
 
+        if args.out_images is not None:
+            cv2.imwrite(os.path.join(args.out_images, str(count) + ".png"), out_img)
+
+        count += 1
         cv2.imshow("Raw", raw)
         cv2.waitKey(1)
-        cv2.imshow("pred_1", pred_1)
+        cv2.imshow("out_img", out_img)
         cv2.waitKey(1)
             
     cap.release()
