@@ -20,7 +20,7 @@
         "debug":                        true,
         "save_model_name" :             "ENET.h5",
         "load_pretrained_weights":        false,
-        "pretrained_weights_path":        "UNET.h5",
+        "pretrained_weights_path":        "ENET.h5",
         "logs_dir" :                    "logs_ENet"
     },
 
