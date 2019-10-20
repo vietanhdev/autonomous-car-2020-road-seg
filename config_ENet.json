@@ -13,15 +13,15 @@
         "train_annotations":            "./data/train/seg",
         "val_images":                   "./data/val/rgb",
         "val_annotations":              "./data/val/seg",
-        "train_batch_size":             12,
-        "val_batch_size":               12,
-        "learning_rate":                1e-4,
-        "nb_epochs":                    40,
+        "train_batch_size":             28,
+        "val_batch_size":               28,
+        "learning_rate":                1e-3,
+        "nb_epochs":                    50,
         "debug":                        true,
         "save_model_name" :             "ENET.h5",
         "load_pretrained_weights":        false,
         "pretrained_weights_path":        "UNET.h5",
-        "logs_dir" :                    "logs"
+        "logs_dir" :                    "logs_ENet"
     },
 
     "test": {
