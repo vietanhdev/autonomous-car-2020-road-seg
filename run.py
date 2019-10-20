@@ -44,7 +44,7 @@ argparser.add_argument(
 argparser.add_argument(
     '-oi',
     '--out_images',
-    help='path to output image folder'')
+    help='path to output image folder')
 
 def _main_(args):
     """
