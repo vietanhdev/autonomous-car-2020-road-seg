@@ -16,6 +16,10 @@ import argparse
 import json
 import os
 
+# gpus = tf.config.experimental.list_physical_devices('GPU')
+# if gpus:
+#     tf.config.experimental.set_virtual_device_configuration(gpus[0], [tf.config.experimental.VirtualDeviceConfiguration(memory_limit=7700)])
+
 
 # define command line arguments
 argparser = argparse.ArgumentParser(
@@ -98,10 +102,12 @@ def _main_(args):
         net_input = np.expand_dims(img, axis=0)
         preds = model.predict(net_input, verbose=1)
         pred_1 = preds[:,:,:,1].reshape((input_size[1], input_size[0]))
+        pred_2 = preds[:,:,:,2].reshape((input_size[1], input_size[0]))
+        pred_3 = preds[:,:,:,3].reshape((input_size[1], input_size[0]))
         # pred_1[pred_1 < 0.2] = 0
         # print(pred_1)
 
-        pred_out = 255 * pred_1 # Now scale by 255
+        pred_out = 255 * pred_1 + 100 * pred_2 + 50 * pred_3 # Now scale by 255
         out_img = pred_out.astype(np.uint8)
 
         # Write output
