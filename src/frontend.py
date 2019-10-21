@@ -83,7 +83,7 @@ class Segment(object):
                                              epochs=train_configs["nb_epochs"],
                                              verbose=1,
                                              shuffle=True, callbacks=callback,
-                                             workers=8,
-                                             max_queue_size=32,
+                                             workers=4,
+                                             max_queue_size=8,
                                              use_multiprocessing=True
                                              )

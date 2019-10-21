@@ -9,17 +9,15 @@ Lane Detection
 
 import cv2
 import tensorflow as tf
-for gpu in tf.config.experimental.list_physical_devices('GPU'):
-    tf.compat.v2.config.experimental.set_memory_growth(gpu, True)
 import numpy as np
 import argparse
 import json
 import os
 
-# gpus = tf.config.experimental.list_physical_devices('GPU')
-# if gpus:
-#     tf.config.experimental.set_virtual_device_configuration(gpus[0], [tf.config.experimental.VirtualDeviceConfiguration(memory_limit=7700)])
-
+gpus = tf.config.experimental.list_physical_devices('GPU')
+for gpu in gpus:
+    tf.compat.v2.config.experimental.set_memory_growth(gpu, True)
+    tf.config.experimental.set_virtual_device_configuration(gpu, [tf.config.experimental.VirtualDeviceConfiguration(memory_limit=2000)])
 
 # define command line arguments
 argparser = argparse.ArgumentParser(
