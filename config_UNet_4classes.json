@@ -5,7 +5,7 @@
         "im_height":                    240,
         "out_width":                    320,
         "out_height":                   240,
-        "classes":                      2
+        "classes":                      4
     },
 
     "train": {
@@ -14,18 +14,18 @@
         "val_images":                   "./data/val/rgb",
         "val_annotations":              "./data/val/seg",
         "train_batch_size":             12,
-        "val_batch_size":               8,
-        "learning_rate":                1e-4,
-        "nb_epochs":                    40,
+        "val_batch_size":               12,
+        "learning_rate":                1e-3,
+        "nb_epochs":                    80,
         "debug":                        true,
-        "save_model_name" :             "UNET.h5",
+        "save_model_name" :             "UNET_4classes.h5",
         "load_pretrained_weights":      false,
-        "pretrained_weights_path":      "UNET.h5",
-        "logs_dir" :                    "logs"
+        "pretrained_weights_path":      "UNET_4classes.h5",
+        "logs_dir" :                    "logs_UNet_4Classes"
     },
 
     "test": {
-        "model_file" :                 "UNET.h5",
+        "model_file" :                 "UNET_4classes.h5",
         "test_images":                 "./data/test/rgb",
         "test_annotations":            "./data/test/seg"
     }

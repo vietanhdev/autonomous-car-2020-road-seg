@@ -7,7 +7,7 @@ Lane Detection
 
 """
 
-import cv2
+
 import tensorflow as tf
 for gpu in tf.config.experimental.list_physical_devices('GPU'):
     tf.compat.v2.config.experimental.set_memory_growth(gpu, True)
@@ -57,7 +57,9 @@ def _main_(args):
     # Load best model
     model.load_weights(config['test']['model_file'])
 
-    ious = []
+    ious_road = []
+    ious_car = []
+    ious_perdestrian = []
     fps_history = []
     for inp, ann  in tqdm( get_pairs_from_paths(config['test']['test_images'], config['test']['test_annotations']) ):
         net_input = np.expand_dims(get_image_arr(inp, input_size[0], input_size[1]), axis=0)
@@ -71,13 +73,15 @@ def _main_(args):
         pred = pred_raw[:,:,:,:].reshape((pred_raw.shape[1], pred_raw.shape[2], config['model']['classes']))
         pred[pred>0.5] = 1
         iou = get_iou( ground_truth, pred, config['model']['classes'] )
-        ious.append( iou[1] )
+        
+        ious_road.append( iou[1] )
+        ious_car.append( iou[2] )
+        ious_perdestrian.append( iou[3] )
 
         print("IoU of class 1 (road) in current image: ", iou[1])
         print("Avg. prediction FPS: ", np.mean(fps_history))
 
-    ious = np.array( ious )
-    print("Mean IoU of class 1 (road): "  ,  np.mean(ious ))
+    print("Mean IoU of class 1 (road): "  ,  np.mean(ious_road ))
     print("Avg. prediction FPS: ", np.mean(fps_history))
 
 

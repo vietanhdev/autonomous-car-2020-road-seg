@@ -8,16 +8,14 @@ Lane Detection
 """
 
 import cv2
-import tensorflow as tf
 import numpy as np
 import argparse
 import json
 import os
-
-gpus = tf.config.experimental.list_physical_devices('GPU')
-for gpu in gpus:
+import tensorflow as tf
+for gpu in tf.config.experimental.list_physical_devices('GPU'):
     tf.compat.v2.config.experimental.set_memory_growth(gpu, True)
-    tf.config.experimental.set_virtual_device_configuration(gpu, [tf.config.experimental.VirtualDeviceConfiguration(memory_limit=2000)])
+from src.frontend import Segment
 
 # define command line arguments
 argparser = argparse.ArgumentParser(
@@ -68,7 +66,21 @@ def _main_(args):
         config = json.loads(config_buffer.read())
 
     # Load best model
-    model = tf.keras.models.load_model(args.model)
+    # model = tf.keras.models.load_model(args.model)
+
+
+    # parse the json to retrieve the training configuration
+    backend = config["model"]["backend"]
+    input_size = (config["model"]["im_width"], config["model"]["im_height"])
+    classes = config["model"]["classes"]
+
+    # define the model and train
+    segment = Segment(backend, input_size, classes)
+   
+    model = segment.feature_extractor
+
+    # Load best model
+    model.load_weights(config['test']['model_file'])
 
     input_size = (config["model"]["im_width"], config["model"]["im_height"])
 
@@ -115,9 +127,9 @@ def _main_(args):
         road_mask = np.zeros((input_size[1], input_size[0]), np.uint8)
         car_mask = np.zeros((input_size[1], input_size[0]), np.uint8)
         perdestrian_mask = np.zeros((input_size[1], input_size[0]), np.uint8)
-        road_mask[pred_1 > 0.2] = 255
-        car_mask[pred_2 > 0.2] = 255
-        perdestrian_mask[pred_3 > 0.2] = 255
+        road_mask[pred_1 > 0.5] = 255
+        car_mask[pred_2 > 0.5] = 255
+        perdestrian_mask[pred_3 > 0.5] = 255
 
         # Bind mask with img
         out_img = raw.copy()
