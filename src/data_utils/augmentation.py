@@ -60,7 +60,7 @@ def _augment_seg( img , seg  ):
 	aug_det = seq[0].to_deterministic() 
 	image_aug = aug_det.augment_image( img )
 
-	cv2.imshow("image_aug", image_aug)
+	# cv2.imshow("image_aug", image_aug)
 
 	segmap = ia.SegmentationMapsOnImage( seg, shape=img.shape )
 	segmap_aug = aug_det.augment_segmentation_maps( segmap )
