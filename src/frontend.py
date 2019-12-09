@@ -62,7 +62,7 @@ class Segment(object):
 
         # define the callbacks for training
         tb = TensorBoard(log_dir=train_configs["logs_dir"], write_graph=True)
-        mc = ModelCheckpoint(mode='max', filepath=train_configs["save_model_name"], monitor='accuracy',
+        mc = ModelCheckpoint(mode='max', filepath=str(train_configs["save_model_name"]).replace(".h5", "") + ".{epoch:03d}.h5", monitor='accuracy',
                              save_best_only=True,
                              save_weights_only=False, verbose=2)
         es = EarlyStopping(mode='max', monitor='accuracy', patience=6, verbose=1)
@@ -71,7 +71,7 @@ class Segment(object):
             factor=0.2,
             patience=5,
             verbose=1,
-            min_lr=0.05 * train_configs["learning_rate"])
+            min_lr=0.005 * train_configs["learning_rate"])
 
         callback = [tb, mc, es, model_reducelr]
 
