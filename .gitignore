@@ -1,5 +1,7 @@
 logs*
 *.pyc
 UNET*.h5
+ENET*.h5
 .vscode
 data/*
+

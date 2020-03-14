@@ -55,13 +55,13 @@ class DataSequence(Sequence):
         img_seg_pairs_batch = self.img_seg_pairs[idx * self.batch_size: (1 + idx) * self.batch_size]
         for im , seg in img_seg_pairs_batch:
 
-            im = cv2.imread(im , 1 )
-            seg = cv2.imread(seg , 1 )
+            im = cv2.imread(im, cv2.IMREAD_COLOR)
+            seg = cv2.imread(seg, cv2.IMREAD_GRAYSCALE)
 
             if self.do_augment:
-                im , seg[:,:,0] = augment_seg( im , seg[:,:,0] )
+                im, seg = augment_seg(im , seg)
 
-            X.append( get_image_arr(im , self.input_width , self.input_height ,ordering=IMAGE_ORDERING )  )
-            Y.append( get_segmentation_arr( seg , self.n_classes , self.output_width , self.output_height )  )
+            X.append(get_image_arr(im, self.input_width, self.input_height))
+            Y.append(get_segmentation_arr(seg , self.n_classes, self.output_width , self.output_height))
 
         return np.array(X) , np.array(Y)

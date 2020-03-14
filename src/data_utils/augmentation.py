@@ -16,7 +16,7 @@ def load_aug():
 		[
 			# apply the following augmenters to most images
 			iaa.Fliplr(0.5), # horizontally flip 50% of all images
-			iaa.Flipud(0.1), # vertically flip 10% of all images
+			# iaa.Flipud(0.1), # vertically flip 10% of all images
 			# crop images by -5% to 10% of their height/width
 			sometimes(iaa.CropAndPad(
 				percent=(-0.05, 0.05),
@@ -27,7 +27,7 @@ def load_aug():
 			iaa.SomeOf((0, 5),
 				[
 					iaa.OneOf([
-						iaa.GaussianBlur((0, 1.0)), # blur images with a sigma between 0 and 1.0
+						iaa.GaussianBlur((0, 0.5)), # blur images with a sigma between 0 and 1.0
 						iaa.AverageBlur(k=(3, 5)), # blur image using local means with kernel sizes between 3 and 5
 						iaa.MedianBlur(k=(3, 5)), # blur image using local medians with kernel sizes between 3 and 5
 					]),
@@ -40,7 +40,11 @@ def load_aug():
 					# per channel) or change the brightness of subareas
 					iaa.contrast.LinearContrast((0.8, 1.2), per_channel=0.2), # improve or worsen the contrast
 					# iaa.Grayscale(alpha=(0.0, 0.5)),
-					sometimes(iaa.PerspectiveTransform(scale=(0.01, 0.1)))
+					sometimes(iaa.PerspectiveTransform(scale=(0.01, 0.1))),
+					iaa.blur.MotionBlur(k=(3, 7), angle=(0, 360)),
+					iaa.blur.MotionBlur(k=(5, 5), angle=(0, 360)),
+					iaa.blur.MotionBlur(k=(9, 9), angle=(0, 360)),
+					iaa.blur.MotionBlur(k=(15, 15), angle=(0, 360)),
 				],
 				random_order=True
 			)
@@ -52,7 +56,6 @@ def load_aug():
 def _augment_seg( img , seg  ):
 
 	import imgaug as ia
-
 
 	if seq[0] is None:
 		load_aug()
@@ -78,9 +81,7 @@ def _augment_seg( img , seg  ):
 
 
 def try_n_times( fn , n , *args , **kargs):
-	
 	attempts = 0
-
 	while attempts < n:
 		try:
 			return fn( *args , **kargs )

@@ -9,6 +9,7 @@ from src.data_utils.DataSequence import DataSequence
 from src.backend import ENET, VGG, UNET
 from tensorflow.keras import callbacks
 
+import segmentation_models as sm
 
 class Segment(object):
 
@@ -50,40 +51,49 @@ class Segment(object):
         # Data sequence for validation
         val_gen = DataSequence( train_configs["val_images"] , train_configs["val_annotations"],  train_configs["val_batch_size"],  model_configs['classes'] , model_configs['im_height'] , model_configs['im_width'] , model_configs['out_height'] , model_configs['out_width'], do_augment=True)
 
-        # configure the model for training
+        # Configure the model for training
         # https://www.depends-on-the-definition.com/unet-keras-segmenting-images/
-        self.feature_extractor.compile(optimizer=optimizer, loss='categorical_crossentropy',
-                                       metrics=['accuracy'])
+        # if model_configs['classes'] == 2:
+        #     loss_function = 'binary_crossentropy'
+        # else:
+        #     loss_function = 'categorical_crossentropy'
+
+        # Segmentation models losses can be combined together by '+' and scaled by integer or float factor
+        dice_loss = sm.losses.DiceLoss()
+        focal_loss = sm.losses.BinaryFocalLoss() if model_configs['classes'] == 2 else sm.losses.CategoricalFocalLoss()
+        total_loss = dice_loss + (1 * focal_loss)
+        
+
+        iou = sm.metrics.IOUScore(threshold=0.5)
+        fscore = sm.metrics.FScore(threshold=0.5)
+        metrics = [iou, fscore]
+
+    
+        self.feature_extractor.compile(optimizer=optimizer, loss=total_loss,
+            metrics=metrics)
 
         # Load pretrained model
         if train_configs["load_pretrained_weights"]:
             print("Loading pretrained weights: " + train_configs["pretrained_weights_path"])
             self.feature_extractor.load_weights(train_configs["pretrained_weights_path"])
 
-        # define the callbacks for training
+        # Define the callbacks for training
         tb = TensorBoard(log_dir=train_configs["logs_dir"], write_graph=True)
-        mc = ModelCheckpoint(mode='max', filepath=str(train_configs["save_model_name"]).replace(".h5", "") + ".{epoch:03d}.h5", monitor='accuracy',
-                             save_best_only=True,
-                             save_weights_only=False, verbose=2)
-        es = EarlyStopping(mode='max', monitor='accuracy', patience=6, verbose=1)
-        model_reducelr = callbacks.ReduceLROnPlateau(
-            monitor='loss',
-            factor=0.2,
-            patience=5,
-            verbose=1,
-            min_lr=0.005 * train_configs["learning_rate"])
+        mc = ModelCheckpoint(mode="max", filepath=str(train_configs["save_model_name"]).replace(".h5", "") + ".{epoch:03d}.h5", monitor="f1-score",
+            save_best_only=True,
+            save_weights_only=False, verbose=2)
+        callback = [tb, mc]
 
-        callback = [tb, mc, es, model_reducelr]
 
         # Train the model on data generated batch-by-batch by the DataSequence generator
         self.feature_extractor.fit_generator(train_gen,
-                                             steps_per_epoch=len(train_gen),
-                                             validation_data=val_gen, 
-                                             validation_steps=len(val_gen),
-                                             epochs=train_configs["nb_epochs"],
-                                             verbose=1,
-                                             shuffle=True, callbacks=callback,
-                                             workers=12,
-                                             max_queue_size=48,
-                                             use_multiprocessing=True
-                                             )
+            steps_per_epoch=len(train_gen),
+            validation_data=val_gen, 
+            validation_steps=len(val_gen),
+            epochs=train_configs["nb_epochs"],
+            verbose=1,
+            shuffle=True, callbacks=callback,
+            workers=6,
+            max_queue_size=24,
+            use_multiprocessing=True
+            )

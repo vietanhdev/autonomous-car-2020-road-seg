@@ -55,25 +55,27 @@ def get_image_arr( path , width , height , imgNorm="sub_mean" , ordering='channe
 	return img
 
 
-def get_segmentation_arr( path , nClasses ,  width , height , no_reshape=False ):
+def get_segmentation_arr( path , n_classes ,  width , height , no_reshape=False ):
 
-	seg_labels = np.zeros((  height , width  , nClasses ))
+	seg_labels = np.zeros((  height , width  , n_classes ))
 		
 	if type( path ) is np.ndarray:
 		img = path
 	else:
-		img = cv2.imread(path, 1)
+		img = cv2.imread(path, cv2.IMREAD_GRAYSCALE)
 
 	img = cv2.resize(img, ( width , height ) , interpolation=cv2.INTER_NEAREST )
-	img = img[:, : , 0]
 
-	for c in range(nClasses):
-		seg_labels[: , : , c ] = (img == c ).astype(int)
+	if n_classes == 2: # Binary
+		img[img > 0] = 1
+
+	for c in range(n_classes):
+		seg_labels[: , : , c ] = (img == c).astype(int)
 
 	if no_reshape:
 		return seg_labels
 
-	seg_labels = np.reshape(seg_labels, ( height, width, nClasses ))
+	seg_labels = np.reshape(seg_labels, ( height, width, n_classes ))
 	return seg_labels
 
 def verify_segmentation_dataset( images_path , segs_path , n_classes ):

@@ -5,3 +5,4 @@ gtFine_trainvaltest/
 vgg16.npy
 logs/*
 UNET*.h5
+ENET*.h5

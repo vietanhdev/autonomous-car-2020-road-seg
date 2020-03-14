@@ -1,4 +1,4 @@
-name: seg_kitti
+name: segtf2
 channels:
   - defaults
 dependencies:
@@ -57,5 +57,4 @@ dependencies:
     - tqdm==4.36.1
     - werkzeug==0.16.0
     - wrapt==1.11.2
-prefix: /home/ironman/miniconda3/envs/seg_kitti
 
