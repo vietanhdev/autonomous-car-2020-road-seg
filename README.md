@@ -1,5 +1,5 @@
-# Kitti- Road Segmentation
-> Lane Segmentation using several architectures.
+# LaneLineSeg
+> Lane line segmentation using several architectures.
 
 ## I. Preparation:
 
