@@ -19,8 +19,10 @@ import glob
 import os
 from src.data_utils.data_loader import get_pairs_from_paths, get_segmentation_arr, get_image_arr
 from src.frontend import Segment
-from src.metrics import get_iou
+from src.data_utils.DataSequence import DataSequence
 import time
+from tensorflow.keras.optimizers import Adam
+import segmentation_models as sm
 
 # define command line arguments
 argparser = argparse.ArgumentParser(
@@ -57,32 +59,21 @@ def _main_(args):
     # Load best model
     model.load_weights(config['test']['model_file'])
 
-    ious_road = []
-    ious_car = []
-    ious_perdestrian = []
-    fps_history = []
-    for inp, ann  in tqdm( get_pairs_from_paths(config['test']['test_images'], config['test']['test_annotations']) ):
-        net_input = np.expand_dims(get_image_arr(inp, input_size[0], input_size[1]), axis=0)
+    # Data sequence for testing
+    test_gen = DataSequence( config["test"]["test_images"], config["test"]["test_annotations"],  config["test"]["test_batch_size"],  config["model"]["classes"] , config["model"]['im_height'] , config["model"]['im_width'] , config["model"]['out_height'] , config["model"]['out_width'], do_augment=False)
 
-        start_time = time.time()
-        pred_raw = model.predict(net_input)
-        pred_time = time.time() - start_time
-        fps_history.append(1.0 / pred_time)
 
-        ground_truth = get_segmentation_arr( ann , config['model']['classes'],  config['model']['out_width'], config['model']['out_height']  )
-        pred = pred_raw[:,:,:,:].reshape((pred_raw.shape[1], pred_raw.shape[2], config['model']['classes']))
-        pred[pred>0.5] = 1
-        iou = get_iou( ground_truth, pred, config['model']['classes'] )
-        
-        ious_road.append( iou[1] )
-        ious_car.append( iou[2] )
-        ious_perdestrian.append( iou[3] )
+    iou = sm.metrics.IOUScore(threshold=0.5)
+    fscore = sm.metrics.FScore(threshold=0.5)
+    metrics = [iou, fscore]
+    model.compile(optimizer=Adam(0.1), loss="binary_crossentropy",
+        metrics=metrics)
 
-        print("IoU of class 1 (road) in current image: ", iou[1])
-        print("Avg. prediction FPS: ", np.mean(fps_history))
-
-    print("Mean IoU of class 1 (road): "  ,  np.mean(ious_road ))
-    print("Avg. prediction FPS: ", np.mean(fps_history))
+    model.evaluate(test_gen)
+    scores = model.evaluate_generator(test_gen)
+    print("Loss: {:.5}".format(scores[0]))
+    for metric, value in zip(metrics, scores[1:]):
+        print("mean {}: {:.5}".format(metric.__name__, value))
 
 
 if __name__ == '__main__':

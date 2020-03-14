@@ -25,8 +25,9 @@
     },
 
     "test": {
-        "model_file" :                 "ENET.h5",
+        "model_file" :                 "ENET.001.h5",
         "test_images":                 "./data/test/images",
-        "test_annotations":            "./data/test/masks"
+        "test_annotations":            "./data/test/masks",
+        "test_batch_size": 1
     }
 }
