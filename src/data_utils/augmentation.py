@@ -2,6 +2,7 @@
 import random
 import numpy as np
 import cv2
+import random
 
 seq = [None]
 
@@ -24,10 +25,10 @@ def load_aug():
 			)),
 			# execute 0 to 5 of the following (less important) augmenters per image
 			# don't execute all of them, as that would often be way too strong
-			iaa.SomeOf((0, 5),
+			iaa.SomeOf((0, 3),
 				[
 					iaa.OneOf([
-						iaa.GaussianBlur((0, 0.5)), # blur images with a sigma between 0 and 1.0
+						iaa.GaussianBlur((0, 1.0)), # blur images with a sigma between 0 and 1.0
 						iaa.AverageBlur(k=(3, 5)), # blur image using local means with kernel sizes between 3 and 5
 						iaa.MedianBlur(k=(3, 5)), # blur image using local medians with kernel sizes between 3 and 5
 					]),
@@ -40,11 +41,7 @@ def load_aug():
 					# per channel) or change the brightness of subareas
 					iaa.contrast.LinearContrast((0.8, 1.2), per_channel=0.2), # improve or worsen the contrast
 					# iaa.Grayscale(alpha=(0.0, 0.5)),
-					sometimes(iaa.PerspectiveTransform(scale=(0.01, 0.1))),
-					iaa.blur.MotionBlur(k=(3, 7), angle=(0, 360)),
-					iaa.blur.MotionBlur(k=(5, 5), angle=(0, 360)),
-					iaa.blur.MotionBlur(k=(9, 9), angle=(0, 360)),
-					iaa.blur.MotionBlur(k=(15, 15), angle=(0, 360)),
+					sometimes(iaa.PerspectiveTransform(scale=(0.01, 0.1)))
 				],
 				random_order=True
 			)
@@ -59,6 +56,27 @@ def _augment_seg( img , seg  ):
 
 	if seq[0] is None:
 		load_aug()
+
+	# Add snow
+	if random.random() < 0.2:
+		img_h, img_w = img.shape[:2]
+		for _ in range(random.randint(200, 1000)):
+
+			overlay = img.copy()
+			alpha = random.random()  # Transparency factor.
+
+			y_min = random.randint(img_h * .5, img_h * .8)
+			x, y, a, b = random.randint(1, img_w), random.randint(y_min, img_h), random.randint(1, 5), random.randint(1, 5)  # Rectangle parameters
+			overlay = cv2.ellipse(overlay, (x, y), (a, b), 45, 0, 360, (255, 255, 255), -1)
+
+			y_min = random.randint(img_h * .5, img_h * .8)
+			y_max = random.randint(img_h * .9, img_h)
+			x, y, a, b = random.randint(1, img_w), random.randint(y_min, y_max), random.randint(1, 5), random.randint(1, 5)  # Rectangle parameters
+			overlay = cv2.ellipse(overlay, (x, y), (a, b), 45, 0, 360, (255, 255, 255), -1)
+
+			# Following line overlays transparent rectangle over the image
+			img = cv2.addWeighted(overlay, alpha, img, 1 - alpha, 0)
+
 	
 	aug_det = seq[0].to_deterministic() 
 	image_aug = aug_det.augment_image( img )
@@ -68,7 +86,6 @@ def _augment_seg( img , seg  ):
 	segmap = ia.SegmentationMapsOnImage( seg, shape=img.shape )
 	segmap_aug = aug_det.augment_segmentation_maps( segmap )
 	segmap_aug = segmap_aug.get_arr()
-
 
 	# segmap_vis = segmap_aug.copy()
 	# segmap_vis[segmap_aug==1] = 255
@@ -81,7 +98,9 @@ def _augment_seg( img , seg  ):
 
 
 def try_n_times( fn , n , *args , **kargs):
+	
 	attempts = 0
+
 	while attempts < n:
 		try:
 			return fn( *args , **kargs )
@@ -94,5 +113,4 @@ def try_n_times( fn , n , *args , **kargs):
 
 def augment_seg( img , seg  ):
 	return try_n_times( _augment_seg , 10 ,  img , seg  )
-
 
