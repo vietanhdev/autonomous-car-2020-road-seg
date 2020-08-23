@@ -1,11 +1,16 @@
-# LaneLineSeg
-> Lane line segmentation using several architectures.
+# Road segmentation - Autonomous car - FPT Digital Race (Cuộc Đua Số) 2020
+
+This repository contains source code for road segmentation using ENet and UNet.
+
+- Repository for car system: <https://github.com/vietanhdev/autonomous-car-2020>.
+- Repository for road segmentation: <https://github.com/vietanhdev/autonomous-car-2020-road-seg>.
+- Repository for traffic sign detection: <https://github.com/vietanhdev/autonomous-car-2020-sign-detection>.
 
 ## I. Preparation:
 
 - Install environment using Anaconda: `environment.yml`.
 
-- Download dataset [here](), extract into `./data`.
+- Download dataset, extract into `./data`.
 
 ## II. Training:
 
